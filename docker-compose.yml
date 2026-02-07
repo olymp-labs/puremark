@@ -1,0 +1,21 @@
+services:
+  puremark:
+    container_name: puremark
+    image: puremark:latest
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    cap_drop:
+      - ALL
+    cpus: "0.1"
+    mem_limit: "100M"
+    volumes:
+      - "data:/app/db/"
+    # See .env file for env variable descriptions
+    #environment:
+    #  - DB_PREFILL=false
+    #  - DB_ALLOW_EXPORT=true
+    #  - DB_ALLOW_IMPORT=true
+
+volumes:
+  data:

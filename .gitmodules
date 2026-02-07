@@ -1,0 +1,3 @@
+[submodule "nextjs-security-headers"]
+	path = nextjs-security-headers
+	url = https://github.com/olymp-labs/nextjs-security-headers

@@ -1,0 +1,7 @@
+services:
+  puremark:
+    container_name: puremark-dev
+    image: puremark-dev:latest
+    build: .
+    env_file:
+      - .env
