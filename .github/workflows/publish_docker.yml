@@ -49,6 +49,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           submodules: true
+          token: ${{ secrets.NEXTJS_LIB_PAT }}
 
       - name: Prepare
         run: |
