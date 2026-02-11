@@ -23,6 +23,10 @@
 
 👉 We got you. With *Puremark* you can search for the right bookmark blazingly fast by just typing and striking your `Enter ↵` key.
 
+> [!IMPORTANT]  
+> This project is gonna be released very soon  
+> Setup instructions also coming very soon ;)
+
 > [!TIP]
 > Try out the demo at [demo-puremark.olymplabs.io](https://demo-puremark.olymplabs.io)
 
