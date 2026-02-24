@@ -1,3 +1,3 @@
-import { baseNextConfig } from "nextjs-security-headers";
+import { baseNextConfig } from "nextjs-secure-config";
 
 export default baseNextConfig();

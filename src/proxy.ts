@@ -1,12 +1,16 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { infuseCsp } from "nextjs-security-headers";
+import { infuseRequestCspHeaders, infuseResponseCspHeaders } from "nextjs-secure-config";
 
 export function proxy(request: NextRequest) {
-  return NextResponse.next({
-    request: {
-      headers: infuseCsp(request.headers),
-    },
-  });
+  const requestHeaders = infuseRequestCspHeaders(request.headers);
+  return infuseResponseCspHeaders(
+    requestHeaders,
+    NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    }),
+  );
 }
 
 export const config = {
