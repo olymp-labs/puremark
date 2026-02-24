@@ -13,7 +13,7 @@
     "framer-motion": "^12.30.0",
     "lucide-react": "^0.563.0",
     "next": "^16.1.6",
-    "nextjs-security-headers": "file:nextjs-security-headers/nextjs-security-headers.tgz",
+    "nextjs-secure-config": "file:nextjs-secure-config/nextjs-secure-config.tgz",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
   },

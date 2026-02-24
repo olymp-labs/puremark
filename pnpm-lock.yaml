@@ -23,9 +23,9 @@ importers:
       next:
         specifier: ^16.1.6
         version: 16.1.6(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      nextjs-security-headers:
-        specifier: file:nextjs-security-headers/nextjs-security-headers.tgz
-        version: file:nextjs-security-headers/nextjs-security-headers.tgz
+      nextjs-secure-config:
+        specifier: file:nextjs-secure-config/nextjs-secure-config.tgz
+        version: file:nextjs-secure-config/nextjs-secure-config.tgz
       react:
         specifier: ^19.2.4
         version: 19.2.4
@@ -678,8 +678,8 @@ packages:
       sass:
         optional: true
 
-  nextjs-security-headers@file:nextjs-security-headers/nextjs-security-headers.tgz:
-    resolution: {integrity: sha512-wtU1nFF2wHowK8rjc10WONrcOjTebOqQTWZ4wK0asAjnH6vRRvxPch/4m5UyjeFNQgj8Y/gYzS495VYRBSO4eA==, tarball: file:nextjs-security-headers/nextjs-security-headers.tgz}
+  nextjs-secure-config@file:nextjs-secure-config/nextjs-secure-config.tgz:
+    resolution: {integrity: sha512-D3ferL7rK0fnUO5Qn8XAEMmsBhB0W7ktsOyn7mR3cktKiRaMBEkYESPMvztCjiAyWwANcyGAmMk3y833NtBPGA==, tarball: file:nextjs-secure-config/nextjs-secure-config.tgz}
     version: 1.0.0
     engines: {node: '>=16.0.0'}
 
@@ -1253,7 +1253,7 @@ snapshots:
       - '@babel/core'
       - babel-plugin-macros
 
-  nextjs-security-headers@file:nextjs-security-headers/nextjs-security-headers.tgz: {}
+  nextjs-secure-config@file:nextjs-secure-config/nextjs-secure-config.tgz: {}
 
   node-abi@3.87.0:
     dependencies:
