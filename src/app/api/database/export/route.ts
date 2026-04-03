@@ -1,6 +1,6 @@
-import fs from "fs";
+import fs from "node:fs";
+import path from "node:path";
 import { NextResponse } from "next/server";
-import path from "path";
 
 const DB_PATH = path.join(process.cwd(), "db", "db.sqlite");
 

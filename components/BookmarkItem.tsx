@@ -35,7 +35,7 @@ export const BookmarkItem: React.FC<Props> = ({
     faviconUrl = item.faviconUrl;
   } else {
     const url = new URL(item.url);
-    if (url && url.hostname) {
+    if (url?.hostname) {
       faviconUrl = `https://favicon.vemetric.com/${url.hostname}`;
     }
   }
