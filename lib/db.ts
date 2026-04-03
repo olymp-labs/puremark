@@ -1,17 +1,18 @@
-import Database from "better-sqlite3";
-import path from "path";
+import type { Database } from "bun:sqlite";
+import path from "node:path";
 
 const DB_PATH = path.join(process.cwd(), "db", "db.sqlite");
 
-let db: Database.Database | null = null;
+let db: Database | null = null;
 
-export function getDb(): Database.Database {
+export function getDb(): Database {
   if (!db) {
     console.log("Initializing database at:", DB_PATH);
     try {
-      db = new Database(DB_PATH);
-      db.pragma("journal_mode = WAL");
-      db.pragma("foreign_keys = ON");
+      const { Database: Db } = require("bun:sqlite") as typeof import("bun:sqlite");
+      db = new Db(DB_PATH);
+      db.exec("PRAGMA journal_mode = WAL");
+      db.exec("PRAGMA foreign_keys = ON");
       initializeDatabase(db);
       console.log("Database initialized successfully");
     } catch (error) {
@@ -22,7 +23,7 @@ export function getDb(): Database.Database {
   return db;
 }
 
-function initializeDatabase(database: Database.Database) {
+function initializeDatabase(database: Database) {
   database.exec(`
     CREATE TABLE IF NOT EXISTS bookmarks (
       id TEXT PRIMARY KEY,
@@ -73,32 +74,23 @@ function initializeDatabase(database: Database.Database) {
   }
 }
 
-function insertInitialBookmarks(database: Database.Database) {
+function insertInitialBookmarks(database: Database) {
   console.log("Pre-filling database with initial bookmarks...");
   const time = Date.now();
 
   const createBookmark = (title: string, url: string, tags: string[]) => {
     const id = crypto.randomUUID();
-    const bookmark = {
-      id,
-      title,
-      url,
-      faviconUrl: null,
-      clicks: 0,
-      createdAt: time,
-      updatedAt: time,
-    };
 
     database
       .prepare(
-        "INSERT INTO bookmarks (id, title, url, faviconUrl, clicks, createdAt, updatedAt) VALUES (@id, @title, @url, @faviconUrl, @clicks, @createdAt, @updatedAt)",
+        "INSERT INTO bookmarks (id, title, url, faviconUrl, clicks, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?)",
       )
-      .run(bookmark);
+      .run(id, title, url, null, 0, time, time);
 
     const insertTag = database.prepare("INSERT INTO tags (bookmark_id, tag_name) VALUES (?, ?)");
-    tags.forEach((tag) => {
+    for (const tag of tags) {
       insertTag.run(id, tag);
-    });
+    }
   };
 
   const bookmarks: Array<[string, string, string[]]> = [
@@ -196,9 +188,9 @@ function insertInitialBookmarks(database: Database.Database) {
     ["Pixiv", "https://pixiv.net", ["pixiv.net"]],
   ];
 
-  bookmarks.forEach(([title, url, tags]) => {
+  for (const [title, url, tags] of bookmarks) {
     createBookmark(title, url, tags);
-  });
+  }
 
   console.log(`Database pre-filled with ${bookmarks.length} bookmarks`);
 }

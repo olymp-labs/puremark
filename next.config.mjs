@@ -1,3 +1,6 @@
 import { baseNextConfig } from "nextjs-secure-config";
 
-export default baseNextConfig();
+export default {
+  ...baseNextConfig(),
+  serverExternalPackages: ["bun:sqlite"],
+};

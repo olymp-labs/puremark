@@ -41,6 +41,7 @@ const App: React.FC = () => {
     try {
       const res = await fetch("/api/bookmarks");
       const data = await res.json();
+      if (!res.ok || !Array.isArray(data)) return;
       setBookmarks(data);
     } catch (error) {
       console.error("Failed to fetch bookmarks:", error);
