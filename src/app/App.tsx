@@ -13,7 +13,7 @@ import type { AppSettings, Bookmark } from "@/types";
 
 const App: React.FC = () => {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
-  const [loading, setLoading] = useState(true);
+
   const [query, setQuery] = useState("");
 
   const [editingItem, setEditingItem] = useState<Bookmark | null>(null);
@@ -45,8 +45,6 @@ const App: React.FC = () => {
       setBookmarks(data);
     } catch (error) {
       console.error("Failed to fetch bookmarks:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -311,14 +309,6 @@ const App: React.FC = () => {
   const hasResults = results.length > 0;
   const showResults = query.length >= 2;
   const maxClicks = hasResults ? Math.max(...results.map((r) => r.clicks || 0)) : 0;
-
-  if (loading) {
-    return (
-      <div className="min-h-screen w-full flex items-center justify-center bg-[#050505] text-neutral-600">
-        <p>Initializing...</p>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center relative bg-[#050505] text-neutral-200 selection:bg-blue-500/30 font-sans">
