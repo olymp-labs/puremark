@@ -1,57 +1,54 @@
-ARG NODE_VERSION=23
+# use the official Bun image
+# see all versions at https://hub.docker.com/r/oven/bun/tags
+FROM oven/bun:1 AS base
+WORKDIR /usr/src/app
 
-FROM node:${NODE_VERSION}-alpine AS base
+# install dependencies into temp directory
+# this will cache them and speed up future builds
+FROM base AS install
+RUN mkdir -p /temp/dev
+COPY package.json bun.lock /temp/dev/
+COPY nextjs-secure-config/nextjs-secure-config.tgz /temp/dev/nextjs-secure-config/nextjs-secure-config.tgz
+RUN cd /temp/dev && bun install --frozen-lockfile
 
-# Install dependencies only when needed
-FROM base AS deps
-WORKDIR /app
+# install with --production (exclude devDependencies)
+RUN mkdir -p /temp/prod
+COPY package.json bun.lock /temp/prod/
+COPY nextjs-secure-config/nextjs-secure-config.tgz /temp/prod/nextjs-secure-config/nextjs-secure-config.tgz
+RUN cd /temp/prod && bun install --frozen-lockfile --production
 
-# Install dependencies
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-# Copy local dependencies
-COPY nextjs-security-headers/nextjs-security-headers.tgz ./nextjs-security-headers/nextjs-security-headers.tgz
-RUN corepack enable pnpm && pnpm i --frozen-lockfile
-
-# Rebuild source code only when needed
-FROM base AS builder
+# copy node_modules from temp directory
+# then copy all (non-ignored) project files into the image
+FROM base AS prerelease
 ARG COMMIT_HASH="unknown"
 
-WORKDIR /app
-# Copy dependencies
-COPY --from=deps /app/node_modules ./node_modules
-# Copy the rest without local dependencies
+COPY --from=install /temp/dev/node_modules node_modules
 COPY . .
-RUN rm -rf nextjs-security-headers
+RUN rm -rf nextjs-secure-config
 
-ENV NEXT_TELEMETRY_DISABLED=1
-ENV NEXT_PUBLIC_COMMIT_HASH=$COMMIT_HASH
-
-RUN corepack enable pnpm && pnpm run build
-RUN mkdir -p db
-
-# Production image, copy all files and run next
-FROM base AS runner
-WORKDIR /app
-
+# optional tests & build
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV NEXT_PUBLIC_COMMIT_HASH=$COMMIT_HASH
+#RUN bun test
+RUN bun run build
+RUN mkdir -p db
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+# copy production dependencies and source code into final image
+FROM base AS release
+RUN useradd --system --uid 1001 nextjs
+COPY --from=install /temp/prod/node_modules node_modules
+COPY --from=prerelease /usr/src/app/package.json .
+# automatically leverage output traces to reduce image size
+# https://nextjs.org/docs/advanced-features/output-file-tracing
+COPY --from=prerelease /usr/src/app/public ./public
+COPY --from=prerelease --chown=nextjs:bun /usr/src/app/.next/standalone ./
+COPY --from=prerelease --chown=nextjs:bun /usr/src/app/.next/static ./.next/static
+COPY --from=prerelease --chown=nextjs:bun /usr/src/app/db ./db
 
-COPY --from=builder /app/public ./public
+ENV NEXT_TELEMETRY_DISABLED=1
 
-# Automatically leverage output traces to reduce image size
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-COPY --from=builder --chown=nextjs:nodejs /app/db ./db
-
+# run the app
 USER nextjs
-
-EXPOSE 3000
-ENV PORT=3000
-
-# server.js is created by next build from the standalone output
-# https://nextjs.org/docs/pages/api-reference/next-config-js/output
-ENV HOSTNAME="0.0.0.0"
-CMD ["node", "server.js"]
+EXPOSE 3000/tcp
+ENTRYPOINT [ "bun", "server.js" ]

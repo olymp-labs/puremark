@@ -27,8 +27,8 @@ export const useSearch = (
     const lowerQuery = query.toLowerCase();
     const filtered = data.filter(
       (item) =>
-        item.title.toLowerCase().includes(lowerQuery) ||
-        item.url.toLowerCase().includes(lowerQuery) ||
+        item.title?.toLowerCase().includes(lowerQuery) ||
+        item.url?.toLowerCase().includes(lowerQuery) ||
         item.tags?.some((tag) => tag.toLowerCase().includes(lowerQuery)),
     );
 

@@ -1,5 +1,5 @@
 #!/bin/sh
 
-./setup.sh
+./run-setup.sh
 git submodule update --remote
-bun update --latest
+bun update

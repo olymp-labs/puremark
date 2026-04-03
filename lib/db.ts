@@ -1,5 +1,8 @@
 import type { Database } from "bun:sqlite";
+import { createRequire } from "node:module";
 import path from "node:path";
+
+const nativeRequire = createRequire(import.meta.url);
 
 const DB_PATH = path.join(process.cwd(), "db", "db.sqlite");
 
@@ -9,10 +12,10 @@ export function getDb(): Database {
   if (!db) {
     console.log("Initializing database at:", DB_PATH);
     try {
-      const { Database: Db } = require("bun:sqlite") as typeof import("bun:sqlite");
+      const { Database: Db } = nativeRequire("bun:sqlite") as typeof import("bun:sqlite");
       db = new Db(DB_PATH);
-      db.exec("PRAGMA journal_mode = WAL");
-      db.exec("PRAGMA foreign_keys = ON");
+      db.prepare("PRAGMA journal_mode = WAL").run();
+      db.prepare("PRAGMA foreign_keys = ON").run();
       initializeDatabase(db);
       console.log("Database initialized successfully");
     } catch (error) {
@@ -24,35 +27,29 @@ export function getDb(): Database {
 }
 
 function initializeDatabase(database: Database) {
-  database.exec(`
-    CREATE TABLE IF NOT EXISTS bookmarks (
-      id TEXT PRIMARY KEY,
-      title TEXT NOT NULL,
-      url TEXT NOT NULL,
-      faviconUrl TEXT,
-      clicks INTEGER DEFAULT 0,
-      createdAt INTEGER NOT NULL,
-      updatedAt INTEGER NOT NULL
-    );
-
-    CREATE INDEX IF NOT EXISTS idx_bookmarks_title ON bookmarks(title COLLATE NOCASE);
-    CREATE INDEX IF NOT EXISTS idx_bookmarks_url ON bookmarks(url COLLATE NOCASE);
-
-    CREATE TABLE IF NOT EXISTS tags (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      bookmark_id TEXT NOT NULL,
-      tag_name TEXT NOT NULL,
-      FOREIGN KEY (bookmark_id) REFERENCES bookmarks(id) ON DELETE CASCADE
-    );
-
-    CREATE INDEX IF NOT EXISTS idx_tags_bookmark_id ON tags(bookmark_id);
-    CREATE INDEX IF NOT EXISTS idx_tags_tag_name ON tags(tag_name COLLATE NOCASE);
-
-    CREATE TABLE IF NOT EXISTS settings (
-      key TEXT PRIMARY KEY,
-      value TEXT NOT NULL
-    );
-  `);
+  database
+    .prepare(
+      "CREATE TABLE IF NOT EXISTS bookmarks (id TEXT PRIMARY KEY, title TEXT NOT NULL, url TEXT NOT NULL, faviconUrl TEXT, clicks INTEGER DEFAULT 0, createdAt INTEGER NOT NULL, updatedAt INTEGER NOT NULL)",
+    )
+    .run();
+  database
+    .prepare("CREATE INDEX IF NOT EXISTS idx_bookmarks_title ON bookmarks(title COLLATE NOCASE)")
+    .run();
+  database
+    .prepare("CREATE INDEX IF NOT EXISTS idx_bookmarks_url ON bookmarks(url COLLATE NOCASE)")
+    .run();
+  database
+    .prepare(
+      "CREATE TABLE IF NOT EXISTS tags (id INTEGER PRIMARY KEY AUTOINCREMENT, bookmark_id TEXT NOT NULL, tag_name TEXT NOT NULL, FOREIGN KEY (bookmark_id) REFERENCES bookmarks(id) ON DELETE CASCADE)",
+    )
+    .run();
+  database.prepare("CREATE INDEX IF NOT EXISTS idx_tags_bookmark_id ON tags(bookmark_id)").run();
+  database
+    .prepare("CREATE INDEX IF NOT EXISTS idx_tags_tag_name ON tags(tag_name COLLATE NOCASE)")
+    .run();
+  database
+    .prepare("CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT NOT NULL)")
+    .run();
 
   const settingsCount = database.prepare("SELECT COUNT(*) as count FROM settings").get() as {
     count: number;

@@ -1,0 +1,11 @@
+services:
+  puremark:
+    image: puremark-dev:latest
+    container_name: puremark-dev
+    build: .
+    restart: no
+    ports:
+      - 3000:3000
+    networks: !reset []
+    env_file:
+      - .env
