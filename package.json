@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "bun --bun next dev --experimental-https",
+    "dev": "bun --bun next dev -p 12300 --experimental-https",
+    "start": "bun --bun next start -p 12300",
     "build": "bun --bun next build",
-    "start": "bun --bun next start",
     "lint": "next lint",
     "clean": "next clean"
   },

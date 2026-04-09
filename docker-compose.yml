@@ -1,6 +1,6 @@
 services:
   puremark:
-    image: ghcr.io/olymp-labs/puremark:main
+    image: ghcr.io/olymp-labs/puremark:prod
     container_name: puremark
     restart: unless-stopped
     cap_drop:
