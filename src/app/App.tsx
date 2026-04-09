@@ -30,7 +30,7 @@ const App: React.FC = () => {
 
   const inputRef = useRef<HTMLInputElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
-  const [isFocused, setIsFocused] = useState(false);
+  const [isFocused, setIsFocused] = useState(true);
 
   useEffect(() => {
     fetchBookmarks();
@@ -415,7 +415,7 @@ const App: React.FC = () => {
               repeat: Infinity,
               ease: "easeInOut",
             }}
-            className="relative overflow-hidden rounded-2xl bg-[#0f0f0f] border shadow-[0_0_0_1px_rgba(255,255,255,0.05)]"
+            className="relative overflow-hidden rounded-2xl bg-[#0f0f0f] border border-neutral-800"
           >
             <div className="flex items-center h-16 px-6">
               <Search

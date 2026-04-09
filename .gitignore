@@ -40,3 +40,6 @@ csv_to_ts.py
 scrape_websites.py
 websites.csv
 websites.ts
+
+# dev
+certificates
